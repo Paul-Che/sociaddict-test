@@ -1,2 +1,51 @@
-<h1>Pages#home</h1>
-<p>Find me in app/views/pages/home.html.erb</p>
+<div class="container">
+    <h2>Bienvenue sur le test !</h2>
+  <% if current_user.nil? %>
+    <p>Vous devez d'abord vous inscrire puis ensuite renseigner qui est votre parrain !</p>
+  <% elsif current_user.parraine_par.nil? %>
+    <h2>Avant de parrainer quelqu'un veuillez renseigner l'email de votre parrain ci-dessous :</h2>
+    <%= simple_form_for @user, :url => @user do |f|%>
+      <% f.error_notification %>
+      <%= f.input :parraine_par, label: "Email du parrain" %>
+      <%= f.button :submit,"Envoyer" %>
+    <% end %>
+  <% else %>
+    - Votre parrain est <%= @user.parraine_par %>!<br>
+    - le parrain initial est :
+    <% if @user.parraine_par == "admin" %>
+      <p>Vous ête le parrain intial !</p>
+    <% else  %>
+      <% @user = User.find_by_email(@user.parraine_par) %>
+      <%= @user.parraine_par %>
+    <% end %>
+
+
+    <% if current_user.filleuls.empty? %>
+      <p>- Vous ne parrainez personne encore !</p>
+    <% else %>
+      <ul class="list-unstyled" >
+        - Voici la liste de tout vos filleuls :
+        <% current_user.filleuls.each do |filleul| %>
+          <li><%= filleul %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <h2>Voulez-vous parrainer quelqu'un ? Si oui ajouter son email ci-dessous :</h2>
+    <%= simple_form_for @user, :url => @user do |f|%>
+      <% f.error_notification %>
+      <%= f.input :new_filleul, label: "Nouveau filleul" %>
+      <%= f.button :submit,"Sauvegarder" %>
+    <% end %>
+    <div>
+      <h3>Liste de tout les utilisateurs qui n'ont parrainé personne : </h3>
+      <% User.where(new_filleul: nil).each do |user| %>
+        <li>
+          <%= user.email %>
+        </li>
+      <% end %>
+    </div>
+  <% end %>
+
+
+</div>
