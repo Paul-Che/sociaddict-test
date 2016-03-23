@@ -45,7 +45,23 @@
         </li>
       <% end %>
     </div>
+    <div>
+      <h3>Liste des 5 utilisateurs qui ont parrainé le plus de personnes : </h3>
+      <% User.order(count: :desc).limit(5).each do |user| %>
+        <li>
+          <%= user.email %>, (<%= user.count %>)
+        </li>
+      <% end %>
+    </div>
+    <div>
+      <h3>Liste de tout les utilisateurs qui ont parrainé au moins 2 personnes : </h3>
+      <% User.where(count: [2..10]).order(count: :desc).each do |user| %>
+        <li>
+          <%= user.email %>, (<%= user.count %>)
+        </li>
+      <% end %>
+    </div>
   <% end %>
 
-
+  <%= link_to "Supprimer mon compte", edit_user_registration_path(@user), data: { confirm: "Etes-vous sur ? L'ensemble de vos filleuls ne pourront accéder au service" }, method: :delete, class: "btn btn-primary" %>
 </div>

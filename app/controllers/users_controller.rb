@@ -12,6 +12,7 @@ class UsersController < ApplicationController
           flash[:alert] = "Vous avez déjà #{@user.new_filleul} comme filleul"
         else
           @user.filleuls << @user.new_filleul
+          @user.count += 1
           @user.save
           flash[:notice] = "Vous avez bien ajouté #{@user.new_filleul} à votre liste de filleul"
         end
@@ -26,6 +27,10 @@ class UsersController < ApplicationController
       flash[:alert] = "Votre parrain ne vous a pas encore ajouté dans sa liste !"
     end
 
+    def destroy
+      @user = User.find(params[:id])
+      @user.destroy
+    end
 
 
     redirect_to root_path
