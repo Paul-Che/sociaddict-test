@@ -1,51 +1,62 @@
 <div class="container">
+  <div class="title">
     <h2>Bienvenue sur le test !</h2>
+  </div>
   <% if current_user.nil? %>
-    <p>Vous devez d'abord vous inscrire puis ensuite renseigner qui est votre parrain !</p>
+    <div class="title">
+      <p>Vous devez d'abord vous inscrire puis ensuite renseigner qui est votre parrain !</p>
+    </div>
   <% elsif current_user.parraine_par.nil? %>
-    <h2>Avant de parrainer quelqu'un veuillez renseigner l'email de votre parrain ci-dessous :</h2>
-    <%= simple_form_for @user, :url => @user do |f|%>
-      <% f.error_notification %>
-      <%= f.input :parraine_par, label: "Email du parrain" %>
-      <%= f.button :submit,"Envoyer" %>
-    <% end %>
+    <div class="card">
+      <h2>Avant de parrainer quelqu'un veuillez renseigner l'email de votre parrain ci-dessous :</h2>
+      <%= simple_form_for @user, :url => @user do |f|%>
+        <% f.error_notification %>
+        <%= f.input :parraine_par, label: "Email du parrain" %>
+        <%= f.button :submit,"Envoyer" %>
+      <% end %>
+    </div>
+  <% elsif User.find_by_email(@user.parraine_par).nil? && current_user.parraine_par != "admin" %>
+      <div class="title">
+        <p>Votre parrain à quitté le service ! vous n'avez donc plus accès à celui-ci également !</p>
+      </div>
   <% else %>
     - Votre parrain est <%= @user.parraine_par %>!<br>
     - le parrain initial est :
     <% if @user.parraine_par == "admin" %>
       <p>Vous ête le parrain intial !</p>
     <% else  %>
-      <% @user = User.find_by_email(@user.parraine_par) %>
       <%= @user.parraine_par %>
     <% end %>
-
-
     <% if current_user.filleuls.empty? %>
       <p>- Vous ne parrainez personne encore !</p>
     <% else %>
       <ul class="list-unstyled" >
-        - Voici la liste de tout vos filleuls :
-        <% current_user.filleuls.each do |filleul| %>
-          <li><%= filleul %></li>
-        <% end %>
+        <div class="card">
+          <h4>Voici la liste de vos filleuls :</h4>
+          <% current_user.filleuls.each do |filleul| %>
+            <li><%= filleul %></li>
+          <% end %>
+        </div>
       </ul>
     <% end %>
 
-    <h2>Voulez-vous parrainer quelqu'un ? Si oui ajouter son email ci-dessous :</h2>
-    <%= simple_form_for @user, :url => @user do |f|%>
-      <% f.error_notification %>
-      <%= f.input :new_filleul, label: "Nouveau filleul" %>
-      <%= f.button :submit,"Sauvegarder" %>
-    <% end %>
-    <div>
+    <h3>Voulez-vous parrainer quelqu'un ? Si oui ajouter son email ci-dessous :</h3>
+    <div class="form">
+      <%= simple_form_for @user, :url => @user do |f|%>
+        <% f.error_notification %>
+        <%= f.input :new_filleul, label: "Nouveau filleul" %>
+        <%= f.button :submit,"Sauvegarder" %>
+      <% end %>
+    </div>
+    <div class="card">
       <h3>Liste de tout les utilisateurs qui n'ont parrainé personne : </h3>
-      <% User.where(new_filleul: nil).each do |user| %>
+      <% User.where(count: 0).each do |user| %>
         <li>
           <%= user.email %>
         </li>
       <% end %>
     </div>
-    <div>
+    <div class="card">
       <h3>Liste des 5 utilisateurs qui ont parrainé le plus de personnes : </h3>
       <% User.order(count: :desc).limit(5).each do |user| %>
         <li>
@@ -53,7 +64,7 @@
         </li>
       <% end %>
     </div>
-    <div>
+    <div class="card">
       <h3>Liste de tout les utilisateurs qui ont parrainé au moins 2 personnes : </h3>
       <% User.where(count: [2..10]).order(count: :desc).each do |user| %>
         <li>
@@ -61,7 +72,10 @@
         </li>
       <% end %>
     </div>
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4">
+      <%= link_to "Supprimer mon compte", edit_user_registration_path(@user), data: { confirm: "Etes-vous sur ? L'ensemble de vos filleuls ne pourront accéder au service" }, method: :delete, class: "btn btn-primary" %>
+    </div>
+  </div>
   <% end %>
-
-  <%= link_to "Supprimer mon compte", edit_user_registration_path(@user), data: { confirm: "Etes-vous sur ? L'ensemble de vos filleuls ne pourront accéder au service" }, method: :delete, class: "btn btn-primary" %>
 </div>
